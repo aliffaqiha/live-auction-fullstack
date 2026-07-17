@@ -45,7 +45,7 @@ jobs:
       - name: Install Frontend Dependencies
         run: |
           cd frontend
-          npm install
+          npm ci
 
       - name: Fix node_modules permissions
         run: |

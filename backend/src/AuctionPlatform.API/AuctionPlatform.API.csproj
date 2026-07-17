@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>AuctionPlatform.API</RootNamespace>
+    <UserSecretsId>auction-platform-api</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
+  <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+  <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.9.0" />
+</ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AuctionPlatform.Application\AuctionPlatform.Application.csproj" />
+    <ProjectReference Include="..\AuctionPlatform.Infrastructure\AuctionPlatform.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

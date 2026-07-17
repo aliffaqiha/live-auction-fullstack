@@ -1,0 +1,53 @@
+name: CI Build & Test
+
+on:
+  push:
+    branches: [ main, master, dev ]
+  pull_request:
+    branches: [ main, master, dev ]
+
+jobs:
+  build-backend:
+    name: Build & Test Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Restore Backend Dependencies
+        run: dotnet restore backend/AuctionPlatform.sln
+
+      - name: Build Backend
+        run: dotnet build backend/AuctionPlatform.sln --no-restore --configuration Release
+
+      - name: Run Backend Tests
+        run: dotnet test backend/AuctionPlatform.sln --no-build --configuration Release
+
+  build-frontend:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Frontend Dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Build Frontend
+        run: |
+          cd frontend
+          npm run build

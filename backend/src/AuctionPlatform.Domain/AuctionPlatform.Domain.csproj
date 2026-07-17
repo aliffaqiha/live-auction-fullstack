@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>AuctionPlatform.Domain</RootNamespace>
+  </PropertyGroup>
+
+  <!--
+    Domain layer sengaja TIDAK punya dependency ke project lain atau ke framework
+    eksternal (EF Core, ASP.NET, dsb). Ini inti dari Onion Architecture:
+    semua layer lain bergantung ke Domain, bukan sebaliknya.
+  -->
+
+</Project>

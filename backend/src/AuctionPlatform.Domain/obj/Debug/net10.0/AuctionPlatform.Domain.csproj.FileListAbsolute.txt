@@ -1,0 +1,11 @@
+D:\Project_Fullstack_Alif\LiveAuction\backend\src\AuctionPlatform.Domain\bin\Debug\net10.0\AuctionPlatform.Domain.deps.json
+D:\Project_Fullstack_Alif\LiveAuction\backend\src\AuctionPlatform.Domain\bin\Debug\net10.0\AuctionPlatform.Domain.dll
+D:\Project_Fullstack_Alif\LiveAuction\backend\src\AuctionPlatform.Domain\bin\Debug\net10.0\AuctionPlatform.Domain.pdb
+D:\Project_Fullstack_Alif\LiveAuction\backend\src\AuctionPlatform.Domain\obj\Debug\net10.0\AuctionPlatform.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\Project_Fullstack_Alif\LiveAuction\backend\src\AuctionPlatform.Domain\obj\Debug\net10.0\AuctionPlatform.Domain.AssemblyInfoInputs.cache
+D:\Project_Fullstack_Alif\LiveAuction\backend\src\AuctionPlatform.Domain\obj\Debug\net10.0\AuctionPlatform.Domain.AssemblyInfo.cs
+D:\Project_Fullstack_Alif\LiveAuction\backend\src\AuctionPlatform.Domain\obj\Debug\net10.0\AuctionPlatform.Domain.csproj.CoreCompileInputs.cache
+D:\Project_Fullstack_Alif\LiveAuction\backend\src\AuctionPlatform.Domain\obj\Debug\net10.0\AuctionPlatform.Domain.dll
+D:\Project_Fullstack_Alif\LiveAuction\backend\src\AuctionPlatform.Domain\obj\Debug\net10.0\refint\AuctionPlatform.Domain.dll
+D:\Project_Fullstack_Alif\LiveAuction\backend\src\AuctionPlatform.Domain\obj\Debug\net10.0\AuctionPlatform.Domain.pdb
+D:\Project_Fullstack_Alif\LiveAuction\backend\src\AuctionPlatform.Domain\obj\Debug\net10.0\ref\AuctionPlatform.Domain.dll

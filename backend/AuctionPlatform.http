@@ -1,0 +1,143 @@
+### ==========================================================
+### Auction Platform - API Testing
+### Bisa dijalankan langsung dari VS Code (extension "REST Client")
+### atau JetBrains Rider (built-in HTTP Client)
+### ==========================================================
+
+@baseUrl = http://localhost:8080
+
+### ─────────────────────────────────────────────
+### AUTH
+### ─────────────────────────────────────────────
+
+### Register user baru (Bidder)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "testbidder@example.com",
+  "password": "Password123!",
+  "fullName": "Test Bidder",
+  "role": "Bidder"
+}
+
+### Register user baru (Seller)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "testseller@example.com",
+  "password": "Password123!",
+  "fullName": "Test Seller",
+  "role": "Seller"
+}
+### Register User Salah
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "emailtidakvalid@example.com",
+  "password": "123",
+  "fullName": "",
+  "role": "Superadmin"
+}
+
+### Login BIDDER - JWT akan otomatis tersimpan di HttpOnly Cookie
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "testbidder@example.com",
+  "password": "Password123!"
+}
+
+### Login SELLER - JWT akan otomatis tersimpan di HttpOnly Cookie
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "testseller@example.com",
+  "password": "Password123!"
+}
+
+### Cek user yang sedang login (butuh cookie dari login di atas)
+GET {{baseUrl}}/api/auth/me
+
+### Logout
+POST {{baseUrl}}/api/auth/logout
+
+
+### ─────────────────────────────────────────────
+### AUCTIONS
+### ─────────────────────────────────────────────
+
+### List semua lelang (default: Active + Scheduled)
+GET {{baseUrl}}/api/auctions
+
+### List lelang dengan filter status
+GET {{baseUrl}}/api/auctions?status=Inactive
+
+### List lelang dengan search judul
+GET {{baseUrl}}/api/auctions/my-selling
+
+### List lelang dengan pagination
+GET {{baseUrl}}/api/auctions?page=1&pageSize=5
+
+### Detail lelang (ganti id dengan hasil dari GET /api/auctions)
+GET {{baseUrl}}/api/auctions/cf2c217e-c6b3-4595-9e6b-d984d80b6c39
+
+### Cancel auction (login sebagai seller)
+DELETE {{baseUrl}}/api/auctions/{auctionId}
+
+### Buat lelang baru (butuh login sebagai Seller dan punya itemId)
+POST {{baseUrl}}/api/auctions
+Content-Type: application/json
+
+{
+  "itemId": "b6136eb5-0c16-4bf9-b121-93cd65b8213",
+  "startingPrice": 5000000,
+  "reservePrice": null,
+  "bidIncrement": 50000,
+  "buyNowPrice": null,
+  "startTime": "2026-07-06T10:00:00Z",
+  "endTime": "2026-07-10T10:00:00Z"
+}
+
+### Place bid (butuh login sebagai Bidder, ganti auctionId)
+POST {{baseUrl}}/api/auctions/ddb0522b-a708-4574-af3f-5bb439beacfa/bids
+Content-Type: application/json
+
+{
+  "amount": 4500000
+}
+
+### Cek saldo wallet (butuh login)
+GET {{baseUrl}}/api/wallet
+
+### Top up saldo
+POST {{baseUrl}}/api/wallet/topup
+Content-Type: application/json
+
+{
+  "amount": 5000000
+}
+
+### List kategori (public)
+GET {{baseUrl}}/api/categories
+
+### Buat item baru (login sebagai seller dulu)
+POST {{baseUrl}}/api/items
+Content-Type: application/json
+
+{
+  "categoryId": "91e19ffe-4350-4741-a2a7-be5d918ffa47",
+  "title": "Parfum",
+  "description": "Parfum",
+  "condition": "Used",
+  "imageUrls": ["https://picsum.photos/seed/parfum1/400/300"]
+}
+
+### List item saya (login sebagai seller)
+GET {{baseUrl}}/api/items/mine

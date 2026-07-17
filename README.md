@@ -26,8 +26,6 @@ Platform lelang online real-time dengan sistem bidding yang aman dari race condi
 
 ## Ringkasan
 
-Balai Lelang adalah simulasi platform lelang online (mirip eBay/Christie's digital) di mana:
-
 - **Seller** bisa mendaftarkan barang, membuat lelang, membatalkan lelang, dan melakukan relist kalau barang gagal terjual
 - **Bidder** bisa menawar barang secara real-time, membeli langsung lewat opsi Buy Now, dan melihat riwayat lelang yang pernah diikuti
 - **Sistem** secara otomatis mengelola siklus hidup lelang — mengaktifkan lelang terjadwal, menutup lelang yang sudah berakhir, dan melakukan settlement (penentuan pemenang + potong saldo) tanpa campur tangan manual
@@ -160,7 +158,7 @@ Setelah semua container jalan:
 | MinIO Console | http://localhost:9001 (minioadmin / minioadmin) |
 | PostgreSQL | localhost:5432 (auction / auction123) |
 
-Database akan otomatis ter-migrate dan ter-seed dengan data dummy (50 barang dari DummyJSON, 15+ user, 30 lelang) saat backend pertama kali start — tidak perlu command tambahan.
+Database akan otomatis ter-migrate dan ter-seed dengan data dummy (50 barang dari DummyJSON, 15+ user, 30 lelang) saat backend pertama kali start tidak perlu command tambahan.
 
 ### Development Lokal (tanpa Docker)
 
@@ -229,8 +227,6 @@ Atau daftar akun baru sendiri lewat halaman Register.
 ---
 
 ## Keterbatasan & Rencana Lanjutan
-
-Ditulis secara jujur supaya jelas apa yang production-ready dan apa yang masih simulasi:
 
 - **Upload gambar** — saat ini pakai input URL manual, belum terhubung ke MinIO
 - **Email notifikasi** — masih disimulasikan lewat console log, belum terhubung ke SMTP asli

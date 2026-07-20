@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import type { AuctionSummary } from "../services/apiClient";
 import { getAuctions } from "../services/apiClient";
 import { LotCard } from "../components/LotCard";
-import "./AuctionListPage.css";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
 
 const STATUS_FILTERS = [
   { value: "", label: "Semua" },
@@ -22,37 +23,43 @@ export function AuctionListPage() {
       getAuctions({ status: status || undefined, search: search || undefined, pageSize: 24 })
         .then((res) => setAuctions(res.items))
         .finally(() => setLoading(false));
-    }, 300); // debounce search
+    }, 300);
 
     return () => clearTimeout(timeout);
   }, [status, search]);
 
   return (
-    <div className="auction-list-page">
-      <section className="auction-list-hero">
-        <span className="auction-list-hero__eyebrow">Katalog Malam Ini</span>
-        <h1 className="auction-list-hero__title">Setiap lot punya satu kesempatan.</h1>
-        <p className="auction-list-hero__subtitle">
+    <div className="mx-auto max-w-[1200px] px-6">
+      <section className="border-b border-border py-8 pb-6">
+        <span className="mb-3 block font-mono text-xs uppercase tracking-[0.1em] text-brass">
+          Katalog Malam Ini
+        </span>
+        <h1 className="mb-4 max-w-[700px] font-display text-4xl font-semibold leading-tight md:text-5xl">
+          Setiap lot punya satu kesempatan.
+        </h1>
+        <p className="max-w-[560px] text-base leading-relaxed text-muted-foreground">
           Telusuri barang yang sedang dan akan dilelang. Palu jatuh saat waktu habis — tidak ada perpanjangan
           kecuali penawaran masuk di detik terakhir.
         </p>
       </section>
 
-      <div className="auction-list-controls">
-        <div className="auction-list-filters">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex gap-2">
           {STATUS_FILTERS.map((f) => (
-            <button
+            <Button
               key={f.value}
-              className={`auction-list-filter ${status === f.value ? "auction-list-filter--active" : ""}`}
+              variant={status === f.value ? "default" : "outline"}
+              size="sm"
+              className="rounded-full"
               onClick={() => setStatus(f.value)}
             >
               {f.label}
-            </button>
+            </Button>
           ))}
         </div>
-        <input
+        <Input
           type="search"
-          className="auction-list-search"
+          className="w-[240px]"
           placeholder="Cari barang…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -60,11 +67,11 @@ export function AuctionListPage() {
       </div>
 
       {loading ? (
-        <div className="auction-list-empty">Memuat katalog…</div>
+        <div className="py-8 text-center text-muted-foreground">Memuat katalog…</div>
       ) : auctions.length === 0 ? (
-        <div className="auction-list-empty">Tidak ada lot yang cocok dengan pencarian ini.</div>
+        <div className="py-8 text-center text-muted-foreground">Tidak ada lot yang cocok dengan pencarian ini.</div>
       ) : (
-        <div className="auction-list-grid">
+        <div className="grid grid-cols-1 gap-5 pb-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {auctions.map((auction, idx) => (
             <LotCard key={auction.id} auction={auction} lotNumber={idx + 1} />
           ))}

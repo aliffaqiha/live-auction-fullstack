@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getMyItems, type MyItem } from "../services/apiClient";
-import "./MyItemsPage.css";
+import { Button } from "../components/ui/button";
+import { Card, CardContent } from "../components/ui/card";
 
 export function MyItemsPage() {
   const [items, setItems] = useState<MyItem[]>([]);
@@ -14,58 +15,58 @@ export function MyItemsPage() {
   }, []);
 
   return (
-    <div className="my-items-page">
-      <div className="my-items-page__header">
+    <div className="mx-auto max-w-[800px] px-6">
+      <div className="mb-6 flex items-end justify-between">
         <div>
-          <span className="my-items-page__eyebrow">Panel Penjual</span>
-          <h1 className="my-items-page__title">Item Saya</h1>
+          <span className="mb-2 block font-mono text-xs uppercase tracking-[0.1em] text-brass">
+            Panel Penjual
+          </span>
+          <h1 className="font-display text-[28px] font-semibold">Item Saya</h1>
         </div>
-        <Link to="/my-items/new" className="my-items-page__add-btn">
-          + Tambah Item
-        </Link>
+        <Button asChild>
+          <Link to="/my-items/new">+ Tambah Item</Link>
+        </Button>
       </div>
 
       {loading ? (
-        <p className="my-items-page__empty">Memuat…</p>
+        <p className="py-8 text-center text-muted-foreground">Memuat…</p>
       ) : items.length === 0 ? (
-        <div className="my-items-page__empty-state">
+        <div className="flex flex-col items-center gap-4 py-8 text-center text-muted-foreground">
           <p>Anda belum memiliki item apapun.</p>
-          <Link to="/my-items/new" className="my-items-page__add-btn">
-            Tambah item pertama Anda
-          </Link>
+          <Button asChild>
+            <Link to="/my-items/new">Tambah item pertama Anda</Link>
+          </Button>
         </div>
       ) : (
-        <div className="my-items-list">
+        <div className="flex flex-col gap-3">
           {items.map((item) => (
-            <div key={item.id} className="my-items-row">
-              <div className="my-items-row__image">
-                {item.thumbnailUrl ? (
-                  <img src={item.thumbnailUrl} alt={item.title} />
-                ) : (
-                  <div className="my-items-row__placeholder" />
-                )}
-              </div>
-              <div className="my-items-row__info">
-                <h3>{item.title}</h3>
-                <span className="my-items-row__meta">
-                  {item.categoryName} · Kondisi: {item.condition}
-                </span>
-              </div>
-              <div className="my-items-row__action">
-                <Link
-                  to={`/my-items/${item.id}/auctions`}
-                  className="my-items-row__auction-btn"
-                  style={{ marginRight: "8px" }}
-                >
-                  Kelola Lelang
-                </Link>
-                {!item.hasActiveAuction && (
-                  <Link to={`/my-items/${item.id}/create-auction`} className="my-items-row__auction-btn">
-                    Buat Lelang
-                  </Link>
-                )}
-              </div>
-            </div>
+            <Card key={item.id}>
+              <CardContent className="flex items-center gap-4 p-3">
+                <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-sm">
+                  {item.thumbnailUrl ? (
+                    <img src={item.thumbnailUrl} alt={item.title} className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="h-full w-full bg-charcoal" />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-display text-base font-semibold">{item.title}</h3>
+                  <span className="text-xs text-muted-foreground">
+                    {item.categoryName} · Kondisi: {item.condition}
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <Button asChild variant="outline" size="sm">
+                    <Link to={`/my-items/${item.id}/auctions`}>Kelola Lelang</Link>
+                  </Button>
+                  {!item.hasActiveAuction && (
+                    <Button asChild size="sm">
+                      <Link to={`/my-items/${item.id}/create-auction`}>Buat Lelang</Link>
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}

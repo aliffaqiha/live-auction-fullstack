@@ -18,6 +18,7 @@ export default {
     extend: {
       colors: {
         border: "hsl(var(--border))",
+        "border-strong": "hsl(224 30% 30%)",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
@@ -50,6 +51,23 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        sage: {
+          DEFAULT: "#6e8b74",
+        },
+        ember: {
+          DEFAULT: "#c1442b",
+          hover: "#d65138",
+        },
+        brass: {
+          DEFAULT: "#c9a227",
+          hover: "#ddb531",
+        },
+        charcoal: "#1b1f2a",
+      },
+      fontFamily: {
+        display: ['"Fraunces"', "Georgia", "serif"],
+        body: ['"IBM Plex Sans"', "-apple-system", "sans-serif"],
+        mono: ['"IBM Plex Mono"', '"Courier New"', "monospace"],
       },
       borderRadius: {
         lg: "var(--radius)",

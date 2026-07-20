@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getMySellingHistory, type MySellingHistoryItem } from "../services/apiClient";
-import "./HistoryPages.css";
+import { Badge } from "../components/ui/badge";
+import { Card, CardContent } from "../components/ui/card";
 
 function formatIDR(amount: number) {
   return new Intl.NumberFormat("id-ID", {
@@ -22,39 +23,45 @@ export function MySellingPage() {
   }, []);
 
   return (
-    <div className="history-page">
-      <span className="history-page__eyebrow">Panel Penjual</span>
-      <h1 className="history-page__title">Riwayat Penjualan</h1>
+    <div className="mx-auto max-w-[800px] px-6">
+      <span className="mb-2 block font-mono text-xs uppercase tracking-[0.1em] text-brass">
+        Panel Penjual
+      </span>
+      <h1 className="mb-6 font-display text-[28px] font-semibold">Riwayat Penjualan</h1>
 
       {loading ? (
-        <p className="history-page__empty">Memuat…</p>
+        <p className="py-8 text-center text-muted-foreground">Memuat…</p>
       ) : items.length === 0 ? (
-        <p className="history-page__empty">Belum ada lelang yang selesai.</p>
+        <p className="py-8 text-center text-muted-foreground">Belum ada lelang yang selesai.</p>
       ) : (
-        <div className="history-list">
+        <div className="flex flex-col gap-3">
           {items.map((item) => (
-            <Link key={item.auctionId} to={`/auctions/${item.auctionId}`} className="history-row">
-              <div className="history-row__image">
-                {item.thumbnailUrl ? (
-                  <img src={item.thumbnailUrl} alt={item.itemTitle} />
-                ) : (
-                  <div className="history-row__placeholder" />
-                )}
-              </div>
-              <div className="history-row__info">
-                <h3>{item.itemTitle}</h3>
-                <span className="history-row__meta">
-                  Harga awal: {formatIDR(item.startingPrice)} · {item.totalBids} penawaran
-                  {item.finalPrice && ` · Terjual: ${formatIDR(item.finalPrice)}`}
-                </span>
-              </div>
-              <div className="history-row__status">
-                {item.outcome === "Sold" ? (
-                  <span className="history-badge history-badge--win">Terjual</span>
-                ) : (
-                  <span className="history-badge history-badge--unsold">Gagal Terjual</span>
-                )}
-              </div>
+            <Link key={item.auctionId} to={`/auctions/${item.auctionId}`} className="no-underline">
+              <Card className="transition-colors hover:border-border-strong">
+                <CardContent className="flex items-center gap-4 p-3">
+                  <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-sm">
+                    {item.thumbnailUrl ? (
+                      <img src={item.thumbnailUrl} alt={item.itemTitle} className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="h-full w-full bg-charcoal" />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-display text-[15px] font-semibold">{item.itemTitle}</h3>
+                    <span className="text-xs text-muted-foreground">
+                      Harga awal: {formatIDR(item.startingPrice)} · {item.totalBids} penawaran
+                      {item.finalPrice && ` · Terjual: ${formatIDR(item.finalPrice)}`}
+                    </span>
+                  </div>
+                  <div className="flex-shrink-0">
+                    {item.outcome === "Sold" ? (
+                      <Badge variant="sage">Terjual</Badge>
+                    ) : (
+                      <Badge variant="muted">Gagal Terjual</Badge>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             </Link>
           ))}
         </div>

@@ -4,33 +4,33 @@
 
 @layer base {
   :root {
-    --background: 222 47% 6%;
-    --foreground: 210 40% 98%;
+    --background: 224 52% 11%; /* #12182b */
+    --foreground: 44 20% 92%; /* #e7e4da */
 
-    --card: 222 47% 8%;
-    --card-foreground: 210 40% 98%;
+    --card: 224 47% 16%; /* #1b2340 */
+    --card-foreground: 44 20% 92%;
 
-    --popover: 222 47% 6%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 224 52% 11%;
+    --popover-foreground: 44 20% 92%;
 
-    --primary: 142.1 76.2% 36.3%; 
-    --primary-foreground: 355.7 100% 97.3%;
+    --primary: 45 74% 47%; /* #c9a227 brass */
+    --primary-foreground: 224 47% 12%; /* charcoal */
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 224 40% 19%; /* #232c4d */
+    --secondary-foreground: 44 20% 92%;
 
-    --muted: 217.2 32.6% 12%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 224 40% 14%;
+    --muted-foreground: 220 10% 55%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 224 40% 19%;
+    --accent-foreground: 44 20% 92%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 10 70% 47%; /* #c1442b ember */
+    --destructive-foreground: 44 20% 92%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 142.1 76.2% 36.3%;
+    --border: 224 30% 22%;
+    --input: 224 30% 22%;
+    --ring: 45 74% 47%;
 
     --radius: 0.75rem;
   }
@@ -42,11 +42,9 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 }
 
-/* Custom scrollbars for premium look */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;

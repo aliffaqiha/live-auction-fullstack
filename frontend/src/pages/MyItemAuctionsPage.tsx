@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { apiClient, cancelAuction } from "../services/apiClient";
-import "./MyItemsPage.css";
+import { Button } from "../components/ui/button";
+import { Card, CardContent } from "../components/ui/card";
+import { Alert, AlertDescription } from "../components/ui/alert";
 
 interface AuctionInfo {
   id: string;
@@ -51,77 +53,68 @@ export function MyItemAuctionsPage() {
     }
   }
 
-  if (loading) return <div className="my-items-page">Memuat...</div>;
+  if (loading) return <div className="mx-auto max-w-[800px] px-6">Memuat...</div>;
 
   return (
-    <div className="my-items-page">
-      <div className="my-items-page__header">
+    <div className="mx-auto max-w-[800px] px-6">
+      <div className="mb-6 flex items-end justify-between">
         <div>
-          <span className="my-items-page__eyebrow">Panel Penjual</span>
-          <h1 className="my-items-page__title">Riwayat Lelang Item</h1>
+          <span className="mb-2 block font-mono text-xs uppercase tracking-[0.1em] text-brass">
+            Panel Penjual
+          </span>
+          <h1 className="font-display text-[28px] font-semibold">Riwayat Lelang Item</h1>
         </div>
-        <Link to="/my-items" className="my-items-page__add-btn">
-          ← Kembali
-        </Link>
+        <Button asChild variant="outline">
+          <Link to="/my-items">← Kembali</Link>
+        </Button>
       </div>
 
       {error && (
-        <p style={{ color: "var(--color-ember)", marginBottom: "16px" }}>{error}</p>
+        <Alert variant="destructive" className="mb-4">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       )}
 
       {auctions.length === 0 ? (
-        <p className="my-items-page__empty">Belum ada lelang untuk item ini.</p>
+        <p className="py-8 text-center text-muted-foreground">Belum ada lelang untuk item ini.</p>
       ) : (
-        <div className="my-items-list">
+        <div className="flex flex-col gap-3">
           {auctions.map((auction) => (
-            <div key={auction.id} className="my-items-row">
-              <div className="my-items-row__info">
-                <h3>
-                  Lelang #{auction.id.slice(0, 8).toUpperCase()}
-                </h3>
-                <span className="my-items-row__meta">
-                  Status: {auction.status} ·{" "}
-                  {auction.currentHighestBid
-                    ? `Bid tertinggi: ${formatIDR(auction.currentHighestBid)}`
-                    : `Harga awal: ${formatIDR(auction.startingPrice)}`}
-                </span>
-              </div>
-              <div className="my-items-row__action">
-                <Link
-                  to={`/auctions/${auction.id}`}
-                  className="my-items-row__auction-btn"
-                  style={{ marginRight: "8px" }}
-                >
-                  Lihat
-                </Link>
-                {(auction.status === "Active" || auction.status === "Scheduled") && (
-                  <button
-                    onClick={() => handleCancel(auction.id)}
-                    disabled={cancelling === auction.id}
-                    style={{
-                      background: "none",
-                      border: "1px solid var(--color-ember)",
-                      color: "var(--color-ember)",
-                      padding: "6px 14px",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                      fontSize: "13px",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {cancelling === auction.id ? "Membatalkan..." : "Batalkan"}
-                  </button>
-                )}
-                {auction.status === "Unsold" && (
-                  <Link
-                    to={`/my-items/${itemId}/create-auction`}
-                    className="my-items-row__auction-btn"
-                  >
-                    Relist
-                  </Link>
-                )}
-              </div>
-            </div>
+            <Card key={auction.id}>
+              <CardContent className="flex items-center gap-4 p-3">
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-display text-base font-semibold">
+                    Lelang #{auction.id.slice(0, 8).toUpperCase()}
+                  </h3>
+                  <span className="text-xs text-muted-foreground">
+                    Status: {auction.status} ·{" "}
+                    {auction.currentHighestBid
+                      ? `Bid tertinggi: ${formatIDR(auction.currentHighestBid)}`
+                      : `Harga awal: ${formatIDR(auction.startingPrice)}`}
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <Button asChild variant="outline" size="sm">
+                    <Link to={`/auctions/${auction.id}`}>Lihat</Link>
+                  </Button>
+                  {(auction.status === "Active" || auction.status === "Scheduled") && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleCancel(auction.id)}
+                      disabled={cancelling === auction.id}
+                    >
+                      {cancelling === auction.id ? "Membatalkan..." : "Batalkan"}
+                    </Button>
+                  )}
+                  {auction.status === "Unsold" && (
+                    <Button asChild size="sm">
+                      <Link to={`/my-items/${itemId}/create-auction`}>Relist</Link>
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}

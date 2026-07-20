@@ -5,7 +5,12 @@ import { getAuctionDetail, placeBid, getItemPriceHistory } from "../services/api
 import { getAuctionConnection, joinAuctionRoom, leaveAuctionRoom } from "../services/auctionHub";
 import { useAuth } from "../context/AuthContext";
 import { useCountdown } from "../hooks/useCountdown";
-import "./AuctionDetailPage.css";
+import { Card, CardContent } from "../components/ui/card";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
+import { Label } from "../components/ui/label";
+import { Alert, AlertDescription } from "../components/ui/alert";
+import { Separator } from "../components/ui/separator";
 
 function formatIDR(amount: number) {
   return new Intl.NumberFormat("id-ID", {
@@ -43,7 +48,6 @@ export function AuctionDetailPage() {
       const minNext = (data.currentHighestBid ?? data.startingPrice) + data.bidIncrement;
       setBidAmount(minNext);
 
-      // Riwayat harga hanya relevan kalau item ini pernah di-relist sebelumnya
       if (data.relistCount > 0) {
         getItemPriceHistory(data.itemId).then(setPriceHistory);
       }
@@ -95,23 +99,24 @@ export function AuctionDetailPage() {
       setSubmitting(false);
     }
   }
+
   async function handleBuyNow() {
-  if (!id) return;
-  if (!confirm(`Beli langsung seharga ${formatIDR(auction!.buyNowPrice!)}?`)) return;
-  setBuyNowLoading(true);
-  setBidError(null);
-  try {
-    await buyNowAuction(id);
-    setBidSuccess(true);
-  } catch (err: any) {
-    setBidError(err?.response?.data?.error ?? "Gagal membeli langsung.");
-  } finally {
-    setBuyNowLoading(false);
+    if (!id) return;
+    if (!confirm(`Beli langsung seharga ${formatIDR(auction!.buyNowPrice!)}?`)) return;
+    setBuyNowLoading(true);
+    setBidError(null);
+    try {
+      await buyNowAuction(id);
+      setBidSuccess(true);
+    } catch (err: any) {
+      setBidError(err?.response?.data?.error ?? "Gagal membeli langsung.");
+    } finally {
+      setBuyNowLoading(false);
+    }
   }
-}
 
   if (!auction) {
-    return <div className="auction-detail-loading">Memuat lot…</div>;
+    return <div className="p-8 text-center text-muted-foreground">Memuat lot…</div>;
   }
 
   const currentPrice = auction.currentHighestBid ?? auction.startingPrice;
@@ -119,153 +124,197 @@ export function AuctionDetailPage() {
   const isOwnHighestBid = auction.currentHighestBidderId === user?.userId;
 
   return (
-    <div className="auction-detail-page">
-      <div className="auction-detail-gallery">
-        <div className="auction-detail-gallery__main">
+    <div className="mx-auto grid max-w-[1100px] gap-7 p-6 md:grid-cols-2">
+      {/* Gallery */}
+      <div>
+        <div className="aspect-[4/3] overflow-hidden rounded-lg bg-card">
           {auction.imageUrls[activeImage] ? (
-            <img src={auction.imageUrls[activeImage]} alt={auction.itemTitle} />
+            <img
+              src={auction.imageUrls[activeImage]}
+              alt={auction.itemTitle}
+              className="h-full w-full object-cover"
+            />
           ) : (
-            <div className="auction-detail-gallery__placeholder" />
+            <div className="h-full w-full bg-gradient-to-br from-card to-charcoal" />
           )}
         </div>
         {auction.imageUrls.length > 1 && (
-          <div className="auction-detail-gallery__thumbs">
+          <div className="mt-3 flex gap-2">
             {auction.imageUrls.map((url, idx) => (
               <button
                 key={url + idx}
-                className={`auction-detail-gallery__thumb ${idx === activeImage ? "auction-detail-gallery__thumb--active" : ""}`}
+                className={`h-16 w-16 overflow-hidden rounded-sm border-2 bg-transparent p-0 ${
+                  idx === activeImage ? "border-brass" : "border-transparent"
+                }`}
                 onClick={() => setActiveImage(idx)}
               >
-                <img src={url} alt="" />
+                <img src={url} alt="" className="h-full w-full object-cover" />
               </button>
             ))}
           </div>
         )}
       </div>
 
-      <div className="auction-detail-info">
-        <span className="auction-detail-info__category">{auction.categoryName}</span>
-        <h1 className="auction-detail-info__title">{auction.itemTitle}</h1>
-        <p className="auction-detail-info__meta">
+      {/* Info */}
+      <div>
+        <span className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
+          {auction.categoryName}
+        </span>
+        <h1 className="my-2 font-display text-[32px] font-semibold leading-tight">{auction.itemTitle}</h1>
+        <p className="mb-4 text-[13px] text-muted-foreground">
           Kondisi: {auction.itemCondition} · Dijual oleh {auction.sellerName}
           {auction.relistCount > 0 && ` · Dilelang ulang (ke-${auction.relistCount + 1})`}
         </p>
+        <p className="mb-6 text-sm leading-relaxed text-foreground">{auction.itemDescription}</p>
 
-        <p className="auction-detail-info__description">{auction.itemDescription}</p>
-
-        <div className="auction-detail-panel">
-          <div className="auction-detail-panel__price-block">
-            <span className="auction-detail-panel__label">
-              {auction.currentHighestBid ? "Penawaran tertinggi" : "Harga pembukaan"}
-            </span>
-            <span className="auction-detail-panel__price">{formatIDR(currentPrice)}</span>
-            {isOwnHighestBid && <span className="auction-detail-panel__you-lead">Anda memimpin lelang ini</span>}
-          </div>
-
-          <div className={`auction-detail-panel__countdown ${isUrgent ? "auction-detail-panel__countdown--urgent" : ""}`}>
-            <span className="auction-detail-panel__countdown-label">
-              {auction.status === "Scheduled" ? "Dimulai dalam" : isEnded ? "Status" : "Waktu tersisa"}
-            </span>
-            <span className="auction-detail-panel__countdown-value">
-              {auction.status === "Scheduled" ? "Belum dimulai" : isEnded ? "Palu telah jatuh" : label}
-            </span>
-          </div>
-
-          {isActive && (
-            <div className="auction-detail-bid-form">
-              {!user ? (
-                <p className="auction-detail-bid-form__notice">
-                  Masuk terlebih dahulu untuk mengajukan penawaran.
-                </p>
-              ) : (
-                <>
-                  <label className="auction-detail-bid-form__field">
-                    <span>
-                      Penawaran Anda (min. {formatIDR(currentPrice + auction.bidIncrement)})
-                    </span>
-                    <input
-                      type="number"
-                      value={bidAmount}
-                      min={currentPrice + auction.bidIncrement}
-                      step={auction.bidIncrement}
-                      onChange={(e) => setBidAmount(Number(e.target.value))}
-                    />
-                  </label>
-
-                  {bidError && <p className="auction-detail-bid-form__error">{bidError}</p>}
-                  {bidSuccess && (
-                    <p className="auction-detail-bid-form__success">Penawaran Anda berhasil diajukan!</p>
-                  )}
-
-                  <button className="auction-detail-bid-form__submit" onClick={handlePlaceBid} disabled={submitting}>
-                    {submitting ? "Mengajukan…" : "Ajukan Penawaran"}
-                  </button>
-                  {auction.buyNowPrice && (
-                  <button
-                    onClick={handleBuyNow}
-                    disabled={buyNowLoading}
-                        style={{
-                                background: "var(--color-ember)",
-                                color: "white",
-                                border: "none",
-                                padding: "12px",
-                                borderRadius: "4px",
-                                fontWeight: 600,
-                                marginTop: "8px",
-                              }}
-                  >
-                    {buyNowLoading ? "Memproses…" : `Beli Sekarang — ${formatIDR(auction.buyNowPrice)}`}
-                  </button>
-                )}
-                </>
-                
+        {/* Bid Panel */}
+        <Card className="mb-6">
+          <CardContent className="p-5">
+            <div className="mb-4 flex flex-col">
+              <span className="mb-1 text-xs text-muted-foreground">
+                {auction.currentHighestBid ? "Penawaran tertinggi" : "Harga pembukaan"}
+              </span>
+              <span className="font-mono text-[30px] font-semibold text-brass">{formatIDR(currentPrice)}</span>
+              {isOwnHighestBid && (
+                <span className="mt-2 text-xs font-semibold text-sage">Anda memimpin lelang ini</span>
               )}
             </div>
-          )}
-        </div>
 
+            <Separator className="mb-4" />
+
+            <div className="mb-4 flex items-center justify-between">
+              <span className="text-[13px] text-muted-foreground">
+                {auction.status === "Scheduled" ? "Dimulai dalam" : isEnded ? "Status" : "Waktu tersisa"}
+              </span>
+              <span className={`font-mono text-base font-semibold ${isUrgent ? "text-ember" : ""}`}>
+                {auction.status === "Scheduled"
+                  ? "Belum dimulai"
+                  : isEnded
+                  ? "Palu telah jatuh"
+                  : label}
+              </span>
+            </div>
+
+            {isActive && (
+              <div className="flex flex-col gap-3 border-t border-border pt-4">
+                {!user ? (
+                  <p className="text-[13px] text-muted-foreground">
+                    Masuk terlebih dahulu untuk mengajukan penawaran.
+                  </p>
+                ) : (
+                  <>
+                    <div className="flex flex-col gap-2">
+                      <Label className="text-[13px] text-muted-foreground">
+                        Penawaran Anda (min. {formatIDR(currentPrice + auction.bidIncrement)})
+                      </Label>
+                      <Input
+                        type="number"
+                        className="font-mono text-base"
+                        value={bidAmount}
+                        min={currentPrice + auction.bidIncrement}
+                        step={auction.bidIncrement}
+                        onChange={(e) => setBidAmount(Number(e.target.value))}
+                      />
+                    </div>
+
+                    {bidError && (
+                      <Alert variant="destructive">
+                        <AlertDescription>{bidError}</AlertDescription>
+                      </Alert>
+                    )}
+                    {bidSuccess && (
+                      <Alert className="border-sage/50 bg-sage/15 text-sage">
+                        <AlertDescription>Penawaran Anda berhasil diajukan!</AlertDescription>
+                      </Alert>
+                    )}
+
+                    <Button className="w-full" onClick={handlePlaceBid} disabled={submitting}>
+                      {submitting ? "Mengajukan…" : "Ajukan Penawaran"}
+                    </Button>
+                    {auction.buyNowPrice && (
+                      <Button
+                        variant="destructive"
+                        className="w-full"
+                        onClick={handleBuyNow}
+                        disabled={buyNowLoading}
+                      >
+                        {buyNowLoading
+                          ? "Memproses…"
+                          : `Beli Sekarang — ${formatIDR(auction.buyNowPrice)}`}
+                      </Button>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Price History (relist) */}
         {priceHistory.length > 0 && (
-          <div className="auction-detail-price-history">
-            <h2 className="auction-detail-history__title">Riwayat Lelang Barang Ini</h2>
-            <p className="auction-detail-price-history__note">
-              Barang ini sudah {priceHistory.length}x pernah dilelang sebelumnya.
-            </p>
-            <ul className="auction-detail-price-history__list">
-              {priceHistory.map((entry) => (
-                <li key={entry.auctionId} className="auction-detail-price-history__item">
-                  <span className="auction-detail-price-history__attempt">Percobaan #{entry.relistAttempt}</span>
-                  <span className="auction-detail-price-history__price">
-                    {entry.outcome === "Sold" && entry.finalPrice
-                      ? `Terjual ${formatIDR(entry.finalPrice)}`
-                      : "Gagal terjual"}
-                  </span>
-                  <span className="auction-detail-price-history__date">
-                    {new Date(entry.settledAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <Card className="mb-6">
+            <CardContent className="p-5">
+              <h2 className="mb-1 font-display text-lg font-semibold">Riwayat Lelang Barang Ini</h2>
+              <p className="mb-4 text-[13px] text-muted-foreground">
+                Barang ini sudah {priceHistory.length}x pernah dilelang sebelumnya.
+              </p>
+              <ul className="flex flex-col">
+                {priceHistory.map((entry) => (
+                  <li
+                    key={entry.auctionId}
+                    className="flex items-center justify-between border-b border-border py-3 text-[13px] last:border-b-0"
+                  >
+                    <span className="font-mono text-[12px] text-muted-foreground">
+                      Percobaan #{entry.relistAttempt}
+                    </span>
+                    <span className="font-semibold">
+                      {entry.outcome === "Sold" && entry.finalPrice
+                        ? `Terjual ${formatIDR(entry.finalPrice)}`
+                        : "Gagal terjual"}
+                    </span>
+                    <span className="text-[12px] text-muted-foreground">
+                      {new Date(entry.settledAt).toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
         )}
 
-        <div className="auction-detail-history">
-          <h2 className="auction-detail-history__title">Riwayat Penawaran</h2>
-          {auction.recentBids.length === 0 ? (
-            <p className="auction-detail-history__empty">Belum ada penawaran masuk. Jadilah yang pertama.</p>
-          ) : (
-            <ul className="auction-detail-history__list">
-              {auction.recentBids.map((bid) => (
-                <li key={bid.bidId} className="auction-detail-history__item">
-                  <span className="auction-detail-history__bidder">{bid.bidderName}</span>
-                  <span className="auction-detail-history__amount">{formatIDR(bid.amount)}</span>
-                  <span className="auction-detail-history__time">
-                    {new Date(bid.placedAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        {/* Bid History */}
+        <Card>
+          <CardContent className="p-5">
+            <h2 className="mb-3 font-display text-lg font-semibold">Riwayat Penawaran</h2>
+            {auction.recentBids.length === 0 ? (
+              <p className="text-[13px] text-muted-foreground">
+                Belum ada penawaran masuk. Jadilah yang pertama.
+              </p>
+            ) : (
+              <ul className="flex flex-col">
+                {auction.recentBids.map((bid) => (
+                  <li
+                    key={bid.bidId}
+                    className="flex items-center justify-between border-b border-border py-3 text-[13px] last:border-b-0"
+                  >
+                    <span className="text-foreground">{bid.bidderName}</span>
+                    <span className="font-mono text-brass">{formatIDR(bid.amount)}</span>
+                    <span className="text-[12px] text-muted-foreground">
+                      {new Date(bid.placedAt).toLocaleTimeString("id-ID", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

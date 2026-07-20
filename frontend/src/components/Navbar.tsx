@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import "./Navbar.css";
+import { Button } from "./ui/button";
 
 export function Navbar() {
   const { user, logout } = useAuth();
@@ -14,47 +14,50 @@ export function Navbar() {
   }
 
   return (
-    <header className="navbar">
-      <Link to="/" className="navbar__brand">
-        <span className="navbar__brand-mark">⚒</span>
-        <span className="navbar__brand-text">Balai Lelang</span>
+    <header className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background px-6 py-4">
+      <Link to="/" className="flex items-center gap-2 text-foreground no-underline">
+        <span className="text-xl text-brass">⚒</span>
+        <span className="font-display text-lg font-semibold tracking-tight">Balai Lelang</span>
       </Link>
 
-      <nav className="navbar__actions">
+      <nav className="flex items-center gap-4">
         {user ? (
           <>
             {isSeller && (
-              <Link to="/my-items" className="navbar__wallet-link">
+              <Link to="/my-items" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
                 Item Saya
               </Link>
             )}
             {isSeller && (
-              <Link to="/my-selling" className="navbar__wallet-link">
+              <Link to="/my-selling" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
                 Penjualan
               </Link>
             )}
-            <Link to="/my-bids" className="navbar__wallet-link">
+            <Link to="/my-bids" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
               Riwayat Bid
             </Link>
-            <Link to="/wallet" className="navbar__wallet-link">
+            <Link to="/wallet" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
               Dompet
             </Link>
-            <span className="navbar__paddle" title={user.email}>
+            <span
+              className="rounded-full border border-border-strong px-3 py-1 font-mono text-xs text-brass"
+              title={user.email}
+            >
               Paddle #{user.userId.slice(0, 4).toUpperCase()}
               {isSeller && " · Penjual"}
             </span>
-            <button className="navbar__logout" onClick={handleLogout}>
+            <Button variant="outline" size="sm" onClick={handleLogout}>
               Keluar
-            </button>
+            </Button>
           </>
         ) : (
           <>
-            <Link to="/login" className="navbar__link">
+            <Link to="/login" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
               Masuk
             </Link>
-            <Link to="/register" className="navbar__cta">
-              Daftar
-            </Link>
+            <Button asChild size="sm">
+              <Link to="/register">Daftar</Link>
+            </Button>
           </>
         )}
       </nav>

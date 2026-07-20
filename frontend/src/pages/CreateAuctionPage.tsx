@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { createAuction, getItemPriceHistory, type PriceHistoryEntry } from "../services/apiClient";
-import "./ItemForm.css";
+import { Card, CardContent } from "../components/ui/card";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
+import { Label } from "../components/ui/label";
+import { Alert, AlertDescription } from "../components/ui/alert";
 
 function toLocalInputValue(date: Date) {
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -65,113 +69,125 @@ export function CreateAuctionPage() {
   const isRelist = priceHistory.length > 0;
 
   return (
-    <div className="item-form-page">
-      <span className="item-form-page__eyebrow">Panel Penjual</span>
-      <h1 className="item-form-page__title">{isRelist ? "Lelang Ulang (Relist)" : "Buat Lelang"}</h1>
-      <p className="item-form-page__subtitle">
+    <div className="mx-auto max-w-[560px] px-6">
+      <span className="mb-2 block font-mono text-xs uppercase tracking-[0.1em] text-brass">
+        Panel Penjual
+      </span>
+      <h1 className="mb-2 font-display text-[28px] font-semibold">
+        {isRelist ? "Lelang Ulang (Relist)" : "Buat Lelang"}
+      </h1>
+      <p className="mb-6 text-sm leading-relaxed text-muted-foreground">
         {isRelist
           ? `Ini akan menjadi percobaan lelang ke-${priceHistory.length + 1} untuk barang ini.`
           : "Tentukan harga pembukaan, kelipatan penawaran, dan jadwal lelang untuk item ini."}
       </p>
 
       {isRelist && (
-        <div
-          style={{
-            background: "var(--color-surface)",
-            border: "1px solid var(--color-border)",
-            borderRadius: "8px",
-            padding: "16px",
-            marginBottom: "20px",
-          }}
-        >
-          <h3 style={{ fontSize: "14px", margin: "0 0 8px", color: "var(--color-ink-muted)" }}>
-            Riwayat lelang sebelumnya:
-          </h3>
-          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-            {priceHistory.map((entry) => (
-              <li
-                key={entry.auctionId}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  fontSize: "13px",
-                  padding: "6px 0",
-                  borderBottom: "1px solid var(--color-border)",
-                }}
-              >
-                <span>Percobaan #{entry.relistAttempt}</span>
-                <span>
-                  {entry.outcome === "Sold" && entry.finalPrice
-                    ? `Terjual ${formatIDR(entry.finalPrice)}`
-                    : entry.outcome === "Cancelled"
-                    ? "Dibatalkan"
-                    : "Gagal terjual"}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <Card className="mb-5">
+          <CardContent className="p-4">
+            <h3 className="mb-2 text-sm text-muted-foreground">Riwayat lelang sebelumnya:</h3>
+            <ul className="flex flex-col">
+              {priceHistory.map((entry) => (
+                <li
+                  key={entry.auctionId}
+                  className="flex items-center justify-between border-b border-border py-1.5 text-[13px] last:border-b-0"
+                >
+                  <span>Percobaan #{entry.relistAttempt}</span>
+                  <span>
+                    {entry.outcome === "Sold" && entry.finalPrice
+                      ? `Terjual ${formatIDR(entry.finalPrice)}`
+                      : entry.outcome === "Cancelled"
+                      ? "Dibatalkan"
+                      : "Gagal terjual"}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
       )}
 
-      <form onSubmit={handleSubmit} className="item-form">
-        <label className="item-form__field">
-          <span>Harga Pembukaan (IDR)</span>
-          <input
-            type="number"
-            value={startingPrice}
-            onChange={(e) => setStartingPrice(Number(e.target.value))}
-            min={1}
-            required
-          />
-        </label>
+      <Card>
+        <CardContent className="p-6">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <Label className="text-[13px] text-muted-foreground">Harga Pembukaan (IDR)</Label>
+              <Input
+                type="number"
+                value={startingPrice}
+                onChange={(e) => setStartingPrice(Number(e.target.value))}
+                min={1}
+                required
+              />
+            </div>
 
-        <label className="item-form__field">
-          <span>Kelipatan Penawaran (IDR)</span>
-          <input
-            type="number"
-            value={bidIncrement}
-            onChange={(e) => setBidIncrement(Number(e.target.value))}
-            min={1}
-            required
-          />
-        </label>
+            <div className="flex flex-col gap-2">
+              <Label className="text-[13px] text-muted-foreground">Kelipatan Penawaran (IDR)</Label>
+              <Input
+                type="number"
+                value={bidIncrement}
+                onChange={(e) => setBidIncrement(Number(e.target.value))}
+                min={1}
+                required
+              />
+            </div>
 
-        <label className="item-form__field">
-          <span>Harga Cadangan / Reserve Price (opsional)</span>
-          <input
-            type="number"
-            value={reservePrice}
-            onChange={(e) => setReservePrice(e.target.value === "" ? "" : Number(e.target.value))}
-            placeholder="Kosongkan jika tidak ada"
-          />
-        </label>
+            <div className="flex flex-col gap-2">
+              <Label className="text-[13px] text-muted-foreground">
+                Harga Cadangan / Reserve Price (opsional)
+              </Label>
+              <Input
+                type="number"
+                value={reservePrice}
+                onChange={(e) => setReservePrice(e.target.value === "" ? "" : Number(e.target.value))}
+                placeholder="Kosongkan jika tidak ada"
+              />
+            </div>
 
-        <label className="item-form__field">
-          <span>Harga Beli Sekarang / Buy Now (opsional)</span>
-          <input
-            type="number"
-            value={buyNowPrice}
-            onChange={(e) => setBuyNowPrice(e.target.value === "" ? "" : Number(e.target.value))}
-            placeholder="Kosongkan jika tidak ada opsi beli langsung"
-          />
-        </label>
+            <div className="flex flex-col gap-2">
+              <Label className="text-[13px] text-muted-foreground">
+                Harga Beli Sekarang / Buy Now (opsional)
+              </Label>
+              <Input
+                type="number"
+                value={buyNowPrice}
+                onChange={(e) => setBuyNowPrice(e.target.value === "" ? "" : Number(e.target.value))}
+                placeholder="Kosongkan jika tidak ada opsi beli langsung"
+              />
+            </div>
 
-        <label className="item-form__field">
-          <span>Waktu Mulai</span>
-          <input type="datetime-local" value={startTime} onChange={(e) => setStartTime(e.target.value)} required />
-        </label>
+            <div className="flex flex-col gap-2">
+              <Label className="text-[13px] text-muted-foreground">Waktu Mulai</Label>
+              <Input
+                type="datetime-local"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                required
+              />
+            </div>
 
-        <label className="item-form__field">
-          <span>Waktu Berakhir</span>
-          <input type="datetime-local" value={endTime} onChange={(e) => setEndTime(e.target.value)} required />
-        </label>
+            <div className="flex flex-col gap-2">
+              <Label className="text-[13px] text-muted-foreground">Waktu Berakhir</Label>
+              <Input
+                type="datetime-local"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                required
+              />
+            </div>
 
-        {error && <p className="item-form__error">{error}</p>}
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-        <button type="submit" className="item-form__submit" disabled={loading}>
-          {loading ? "Membuat lelang…" : isRelist ? "Lelang Ulang Sekarang" : "Buat Lelang"}
-        </button>
-      </form>
+            <Button type="submit" className="mt-2 w-full" disabled={loading}>
+              {loading ? "Membuat lelang…" : isRelist ? "Lelang Ulang Sekarang" : "Buat Lelang"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

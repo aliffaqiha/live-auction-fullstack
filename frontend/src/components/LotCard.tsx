@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import type { AuctionSummary } from "../services/apiClient";
 import { useCountdown } from "../hooks/useCountdown";
-import "./LotCard.css";
+import { Badge } from "./ui/badge";
 
 function formatIDR(amount: number) {
   return new Intl.NumberFormat("id-ID", {
@@ -17,39 +17,54 @@ export function LotCard({ auction, lotNumber }: { auction: AuctionSummary; lotNu
   const isScheduled = auction.status === "Scheduled";
 
   return (
-    <Link to={`/auctions/${auction.id}`} className="lot-card">
-      <div className="lot-card__image-wrap">
+    <Link
+      to={`/auctions/${auction.id}`}
+      className="group flex flex-col rounded-lg border border-border bg-card text-card-foreground transition-all hover:-translate-y-1 hover:border-border-strong"
+    >
+      <div className="relative aspect-[4/3] overflow-hidden rounded-t-lg bg-charcoal">
         {auction.thumbnailUrl ? (
-          <img src={auction.thumbnailUrl} alt={auction.itemTitle} className="lot-card__image" />
+          <img src={auction.thumbnailUrl} alt={auction.itemTitle} className="h-full w-full object-cover" />
         ) : (
-          <div className="lot-card__image-placeholder" />
+          <div className="h-full w-full bg-gradient-to-br from-card to-charcoal" />
         )}
-        <span className="lot-card__lot-tag">LOT {String(lotNumber).padStart(3, "0")}</span>
-        {isScheduled && <span className="lot-card__status-tag lot-card__status-tag--scheduled">Segera</span>}
+        <span className="absolute left-3 top-3 rounded-sm border border-brass/35 bg-background/85 px-2 py-0.5 font-mono text-[11px] font-medium tracking-wider text-brass">
+          LOT {String(lotNumber).padStart(3, "0")}
+        </span>
+        {isScheduled && (
+          <Badge variant="sage" className="absolute right-3 top-3">
+            Segera
+          </Badge>
+        )}
       </div>
 
-      <div className="lot-card__body">
-        <span className="lot-card__category">{auction.categoryName}</span>
-        <h3 className="lot-card__title">{auction.itemTitle}</h3>
+      <div className="flex flex-col gap-2 p-4">
+        <span className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
+          {auction.categoryName}
+        </span>
+        <h3 className="font-display text-lg font-semibold leading-snug text-foreground">{auction.itemTitle}</h3>
 
-        <div className="lot-card__price-row">
+        <div className="mt-2 flex items-end justify-between">
           <div>
-            <span className="lot-card__price-label">
+            <span className="mb-0.5 block text-[11px] text-muted-foreground">
               {auction.currentHighestBid ? "Penawaran tertinggi" : "Harga awal"}
             </span>
-            <span className="lot-card__price">{formatIDR(currentPrice)}</span>
+            <span className="font-mono text-[17px] font-semibold text-brass">{formatIDR(currentPrice)}</span>
           </div>
 
           {!isScheduled && (
-            <div className={`lot-card__countdown ${isUrgent ? "lot-card__countdown--urgent" : ""}`}>
+            <span
+              className={`rounded-sm border px-2 py-0.5 font-mono text-[13px] whitespace-nowrap ${
+                isUrgent
+                  ? "animate-pulse border-ember text-ember"
+                  : "border-border-strong text-muted-foreground"
+              }`}
+            >
               {isEnded ? "Selesai" : label}
-            </div>
+            </span>
           )}
         </div>
 
-        <div className="lot-card__meta">
-          <span>{auction.totalBids} penawaran</span>
-        </div>
+        <span className="mt-1 text-xs text-muted-foreground">{auction.totalBids} penawaran</span>
       </div>
     </Link>
   );
